@@ -1,12 +1,10 @@
 #!/bin/sh -c 'echo This file is meant to be sourced.'
 
-set -e
-require general
+require general || return -1
     #seq
-set +e
 
-alias rm='echo del'
-    # Change this line to alias rm=del to make rm(1) safe.
+alias rm='del'
+    # make rm(1) safe.
 
 function del ()
 {
@@ -42,6 +40,8 @@ function trash ()
 {
     local F
     local HOME_DEVICE="$(stat -f %Sd "$HOME")"
+    local TRASHCAN=~/.Trash
+        # Set this in advance _outside_ the loop below
     for F in "$@"
     do
         local DEVICE="$(stat -f %Sd "$F")"
@@ -54,9 +54,7 @@ function trash ()
         
         if [ x"$DEVICE" != x"$HOME_DEVICE" ]
         then
-            local TRASHCAN="$(trashOnDevice "$DEVICE")"
-        else
-            local TRASHCAN=~/.Trash
+            TRASHCAN="$(trashOnDevice "$DEVICE")"
         fi
         
         if [ ! -d "${TRASHCAN}" ]
@@ -102,7 +100,8 @@ function emptytrash ()
     TRASH_SIZE="$( (for i in "${TRASHCANs[@]}"; do ls "$i"/; done) 2>/dev/null | wc -w)"
     if [ "$TRASH_SIZE" -gt 0 ];then 
         echo -n "Emptying trash"
-        for i in "${TRASHCANs[@]}"; do 
+        for i in "${TRASHCANs[@]}"
+        do 
             tput smcup
             pushd "$i" 2>/dev/null && {
                 srm -frsvz . 2>/dev/null ; popd ;
