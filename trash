@@ -31,9 +31,7 @@ function trashOnDevice ()
         MOUNT=""
     fi
     
-    local DEVICE_TRASH="$MOUNT/.Trashes/$UID"
-    
-    echo "$DEVICE_TRASH"
+    echo "$MOUNT/.Trashes/$UID"
 }
 
 function trash ()
@@ -44,6 +42,12 @@ function trash ()
         # Set this in advance _outside_ the loop below
     for F in "$@"
     do
+        if ! test -e "$F"
+        then
+            echo "No such file or directory: $F" 1>&2
+            return 4
+        fi
+        
         local DEVICE="$(stat -f %Sd "$F")"
         
         if [ x"$DEVICE" == x"" ] || [ x"$DEVICE" == x"???" ]
@@ -98,7 +102,8 @@ function emptytrash ()
 
     local TRASH_SIZE
     TRASH_SIZE="$( (for i in "${TRASHCANs[@]}"; do ls "$i"/; done) 2>/dev/null | wc -w)"
-    if [ "$TRASH_SIZE" -gt 0 ];then 
+    if [ "$TRASH_SIZE" -gt 0 ]
+    then 
         echo -n "Emptying trash"
         for i in "${TRASHCANs[@]}"
         do 
