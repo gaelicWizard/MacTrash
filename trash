@@ -1,26 +1,5 @@
 #!/bin/sh -c 'echo This file is meant to be sourced.'
 
-require general || return -1
-    # seq() defined from general
-## Usage : seq n m [i]
-## echo all integers between n and m using a skip or increment of i
-#function seq ()
-#{
-#    [ "$1" ] || [ "$2" ] || return 1
-#    
-#    local x=$1;
-#    local y=$2;
-#    local i=${3:-1};
-#    local seperator="${4:- }"
-#    while [ $x -le $y ]
-#    do
-#        echo -n $x"${seperator}";
-#        x=$(( $x + $i ));
-#    done
-#    echo
-#}
-
-
 alias rm='del'
     # make rm(1) safe.
 
@@ -114,7 +93,7 @@ function emptytrash ()
     IFS='
 '
     local MOUNTS=( $(mount | sed -n 's:/dev/.* on \(.*\) (.*):\1:p') )
-    local TRASHCANs=( "${HOME}/.Trash" $(IFS="$TMPIFS";for i in `seq 0 $(( ${#MOUNTS[@]} - 1 ))`; do echo "${MOUNTS[$i]}/.Trashes/$(id -u)"; done) )
+    local TRASHCANs=( "${HOME}/.Trash" $(IFS="$TMPIFS";for i in `jot - 0 $(( ${#MOUNTS[@]} - 1 ))`; do echo "${MOUNTS[$i]}/.Trashes/$(id -u)"; done) )
     IFS="$TMPIFS"
     unset TMPIFS
 
