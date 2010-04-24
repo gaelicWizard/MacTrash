@@ -92,20 +92,20 @@ function emptytrash ()
     local TMPIFS="$IFS"
     IFS='
 '
-    local MOUNTS=( $(mount | sed -n 's:/dev/.* on \(.*\) (.*):\1:p') )
-    local TRASHCANs=( "${HOME}/.Trash" $(IFS="$TMPIFS";for i in `jot - 0 $(( ${#MOUNTS[@]} - 1 ))`; do echo "${MOUNTS[$i]}/.Trashes/$(id -u)"; done) )
+    local MOUNTS=( $(mount | sed -n 's:/dev/.* on \(.*\) (.*):\1:p') ) mount
+    local TRASHCANs=( "${HOME}/.Trash" $(IFS="$TMPIFS";for mount in "${MOUNTS[@]}"; do echo "${mount}/.Trashes/$(id -u)"; done) )
     IFS="$TMPIFS"
     unset TMPIFS
 
-    local TRASH_SIZE
-    TRASH_SIZE="$( (for i in "${TRASHCANs[@]}"; do ls "$i"/; done) 2>/dev/null | wc -w)"
+    local TRASH_SIZE trashcan
+    TRASH_SIZE="$( (for trashcan in "${TRASHCANs[@]}"; do ls "$trashcan"/; done) 2>/dev/null | wc -w)"
     if [ "$TRASH_SIZE" -gt 0 ]
     then 
         echo -n "Emptying trash"
-        for i in "${TRASHCANs[@]}"
+        for trashcan in "${TRASHCANs[@]}"
         do 
             tput smcup
-            pushd "$i" 2>/dev/null && {
+            pushd "$trashcan" 2>/dev/null && {
                 srm -frsvz . 2>/dev/null ; popd ;
             }
             tput rmcup
