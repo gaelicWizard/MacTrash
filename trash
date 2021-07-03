@@ -1,6 +1,6 @@
 #!/bin/sh -c 'echo This file is meant to be sourced.'
 
-alias rm='del'
+#alias rm='del'
     # make rm(1) safe.
 
 function del ()
